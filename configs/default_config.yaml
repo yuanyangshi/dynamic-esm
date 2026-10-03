@@ -1,0 +1,37 @@
+# Dynamic-ESM Default Configuration
+data:
+  data_dir: "./data"
+  pretrain_dir: "./output/checkpoints"
+  working_dir: "./output"
+  num_frames: 5
+  pocket_radius: 12.0
+  max_seq_len: 1024
+
+model:
+  esm_model_name: "esm2_t12_35M_UR50D"
+  esm_embed_dim: 480
+  gnn_hidden_dim: 128
+  cross_attn_dim: 256
+  num_cross_heads: 4
+  num_cross_layers: 2
+  lora_rank: 16
+  lora_alpha: 16.0
+  lora_dropout: 0.05
+
+training:
+  batch_size: 16
+  val_batch_size: 32
+  learning_rate: 1e-4
+  backbone_lr: 5e-5
+  esm_lora_lr: 2e-4
+  weight_decay: 1e-4
+  num_epochs: 30
+  grad_accum_steps: 2
+  use_amp: true
+  seed: 42
+
+loss:
+  lambda_reg: 0.2
+  lambda_mse: 1.0
+  lambda_rank: 0.5
+  ranking_margin: 0.5

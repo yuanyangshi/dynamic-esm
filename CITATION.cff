@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use Dynamic-ESM in your research, please cite it as below."
+authors:
+  - family-names: "Shi"
+    given-names: "Yuanyang"
+title: "Dynamic-ESM: 4D Spatiotemporal SE(3)-Equivariant Dynamic Protein Language Model for Drug-Target Affinity Prediction"
+version: 1.0.0
+date-released: 2026-10-01
+url: "https://github.com/yuanyangshi/dynamic-esm"
+repository-code: "https://github.com/yuanyangshi/dynamic-esm"
+keywords:
+  - protein language models
+  - molecular dynamics
+  - SE(3) equivariance
+  - drug-target affinity
+  - evidential deep learning
+license: MIT
