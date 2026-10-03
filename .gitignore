@@ -1,0 +1,81 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTorch checkpoints and large model weights (>100MB)
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.h5
+*.hdf5
+checkpoints/
+weights/
+last.ckpt
+
+# Data and cache files
+processed_pt/
+data/pdbs/
+*.pdb
+*.zip
+*.tar
+*.tar.gz
+pdb_metadata_cache.json
+val_empirical_predictions.npz
+
+
+# Environments and Secrets
+.env
+.venv
+env/
+venv/
+ENV/
+*.key
+kaggle.json
+token/
+tokens/
+secrets/
+*.secret
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# PyCharm / VS Code IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs and outputs
+logs/
+wandb/
+lightning_logs/
+output/
+figures/
+*.log
+
+# OS specific files
+.DS_Store
+Thumbs.db

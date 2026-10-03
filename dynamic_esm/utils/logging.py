@@ -1,0 +1,23 @@
+"""
+Standardized logging utilities for Dynamic-ESM.
+"""
+
+import logging
+import sys
+
+
+def get_logger(name: str = "dynamic_esm", level: int = logging.INFO) -> logging.Logger:
+    """Return a configured logger instance with formatted console output."""
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logger.setLevel(level)
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(level)
+        formatter = logging.Formatter(
+            "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.propagate = False
+    return logger
