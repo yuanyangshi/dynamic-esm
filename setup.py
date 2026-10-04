@@ -6,8 +6,8 @@ setup(
     description="Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="yuanyangshi",
-
+    author="Shi-Xin Guo, Xiao-Na Zhang",
+    author_email="gsx112233hs@163.com",
     url="https://github.com/yuanyangshi/dynamic-esm",
     packages=find_packages(),
     python_requires=">=3.9",

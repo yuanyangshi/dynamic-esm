@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "yuanyangshi" }
+    { name = "Shi-Xin Guo", email = "gsx112233hs@163.com" },
+    { name = "Xiao-Na Zhang" }
 ]
 
 keywords = [

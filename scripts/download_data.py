@@ -51,8 +51,11 @@ def download_case_study_pdbs(target_dir: str = "./data/pdbs"):
 def print_dataset_sources():
     """Print official download links and instructions for external datasets."""
     print("=" * 70)
-    print("Dynamic-ESM: Official Dataset Download Sources")
+    print("Dynamic-ESM: Official Dataset & Weight Download Sources")
     print("=" * 70)
+    print("0. Pre-trained Weights & Processed Datasets (Kaggle Cloud):")
+    print("   - Checkpoints & Workspace (NB3): https://www.kaggle.com/datasets/shixinguo/nb3-workspace")
+    print("   - Processed Features & Graphs (NB1): https://www.kaggle.com/code/shixinguo/nb1-20260809/output\n")
     print("1. MISATO MD Trajectories & QM Calculations (Zenodo):")
     print("   URL: https://zenodo.org/records/7711953")
     print("   DOI: 10.5281/zenodo.7711953")

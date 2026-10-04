@@ -104,6 +104,20 @@ pip install -e .
 
 ---
 
+## 💾 Datasets & Pre-trained Model Weights
+
+To reproduce the benchmark results or execute zero-shot affinity inference without retraining from scratch, download the preprocessed data archives and trained model checkpoints:
+
+| Resource | Description | Download Link | Target Local Path |
+| :--- | :--- | :--- | :--- |
+| **Model Weights & Workspace** | Trained Dynamic-ESM checkpoint (`dynamic_esm_main_best.ckpt`, Epoch 47) | [Kaggle: shixinguo/nb3-workspace](https://www.kaggle.com/datasets/shixinguo/nb3-workspace) | `./output/checkpoints/` |
+| **Preprocessed Datasets** | Processed 4D-QM graphs, MMseqs2 cluster splits, and offline ESM-2 representations | [Kaggle: shixinguo/nb1-20260809](https://www.kaggle.com/code/shixinguo/nb1-20260809/output) | `./data/processed_pt/` |
+| **MISATO Trajectories** | Raw multi-nanosecond MD trajectories & GFN2-xTB QM calculations | [Zenodo: 10.5281/zenodo.7711953](https://zenodo.org/records/7711953) | `./data/misato/` |
+| **CASF-2016 Benchmark** | 285 co-crystallized complexes for gold-standard assessment | [PDBbind CASF-2016](http://www.pdbbind.org.cn/casf.php) | `./data/casf2016/` |
+| **Clinical Case Studies** | 6 kinase & viral drug-resistance PDB complexes | `python scripts/download_data.py --download-pdbs` | `./data/pdbs/` |
+
+---
+
 ## 🛠️ CLI Pipeline Execution
 
 ```bash
@@ -158,8 +172,7 @@ If you use Dynamic-ESM in your research, please cite:
 ```bibtex
 @article{dynamic_esm2026,
   title={Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction},
-  author={yuanyangshi},
-
+  author={Guo, Shi-Xin and Zhang, Xiao-Na},
   journal={arXiv preprint},
   year={2026}
 }
@@ -169,3 +182,4 @@ If you use Dynamic-ESM in your research, please cite:
 
 ## 📄 License
 This project is licensed under the [MIT License](LICENSE).
+
