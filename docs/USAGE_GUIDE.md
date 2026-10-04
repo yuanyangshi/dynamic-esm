@@ -99,16 +99,15 @@ import torch
 # Put model in evaluation mode
 model.eval()
 
-# Forward pass with sequence tokens and dynamic graph structures
+# Forward pass with atomic features, coordinate trajectory, and sequence embeddings
 with torch.no_grad():
-    # tokens: [B, L], node_x: [B, T, N, 3], node_attr: [B, T, N, F], edge_index: [2, E]
-    outputs = model(tokens, node_x, node_attr, edge_index)
+    # x: [N, 654], pos: [T, N, 3], seq_embeds: [1, L, 480]
+    gamma, v, alpha, beta = model(x, pos, seq_embeds=seq_embeds, return_attn=False)
     
-    # Extract predicted binding affinity and evidential uncertainties
-    y_pred = outputs["pred"]                   # Mean predicted pK_d / -log(K_d)
-    sigma2_alea = outputs["aleatoric_var"]     # Data/experimental noise
-    sigma2_epis = outputs["epistemic_var"]     # Model epistemic uncertainty
+    # Compute evidential predictive uncertainties via NIG formulation
+    aleatoric, epistemic, total = model.head.compute_uncertainty(v, alpha, beta)
+    y_pred = gamma  # Mean predicted pK_d / -log(K_d)
     
-print(f"Predicted Affinity: {y_pred.item():.3f} | Epistemic Uncertainty: {sigma2_epis.item():.4f}")
+print(f"Predicted Affinity: {y_pred.item():.3f} | Epistemic Uncertainty: {epistemic.item():.4f}")
 ```
 

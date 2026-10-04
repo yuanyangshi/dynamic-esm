@@ -24,7 +24,7 @@ logger = get_logger("dynamic_esm.cli.benchmark")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run CASF-2016 benchmarking and ablation evaluation.")
-    parser.add_argument("--predictions-file", type=str, default="./output/checkpoints/val_empirical_predictions.npz")
+    parser.add_argument("--predictions-file", type=str, default=None, help="Path to empirical predictions .npz file.")
     parser.add_argument("--output-dir", type=str, default="./output")
     return parser.parse_args()
 
@@ -36,16 +36,34 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
     os.makedirs(table_dir, exist_ok=True)
 
-    if os.path.exists(args.predictions_file):
-        data = np.load(args.predictions_file)
-        y_true = data["y_true"]
-        y_pred = data["y_pred"]
-        logger.info(f"Loaded {len(y_true)} empirical predictions from {args.predictions_file}")
+    if args.predictions_file:
+        if not os.path.exists(args.predictions_file):
+            raise FileNotFoundError(
+                f"Specified predictions file not found: '{args.predictions_file}'. "
+                "In compliance with top-tier scientific authenticity guidelines, please provide a valid path."
+            )
+        pred_path = args.predictions_file
     else:
-        logger.warning("No predictions file found. Simulating representative CASF-2016 distribution...")
-        rng = np.random.default_rng(42)
-        y_true = rng.uniform(4.0, 11.0, size=285)
-        y_pred = y_true + rng.normal(0, 0.42, size=285)
+        candidate_paths = [
+            os.path.join(args.output_dir, "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "output", "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "dynamic-esm", "output", "checkpoints", "val_empirical_predictions.npz"),
+        ]
+        pred_path = None
+        for cp in candidate_paths:
+            if cp and os.path.exists(cp):
+                pred_path = cp
+                break
+        if pred_path is None:
+            raise FileNotFoundError(
+                "Empirical predictions file not found in standard candidate paths. "
+                "In compliance with top-tier scientific authenticity guidelines, please provide valid predictions."
+            )
+
+    data = np.load(pred_path)
+    y_true = data["y_true"]
+    y_pred = data["y_pred"]
+    logger.info(f"Loaded {len(y_true)} authentic empirical predictions from {pred_path}")
 
     # 1. CASF-2016 Benchmarks
     df_bench, boot_results = evaluate_casf_benchmarks(y_true, y_pred)

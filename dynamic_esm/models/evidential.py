@@ -19,23 +19,34 @@ class EDLHead(nn.Module):
         beta: scale parameter (> 0)
     """
 
-    def __init__(self, in_dim: int = 256, hidden_dim: int = 128, dropout: float = 0.1):
+    def __init__(self, in_dim: int = 512, hidden_dim: Optional[int] = None, dropout: float = 0.1):
         super().__init__()
-        self.mlp = nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
+        mid_dim = hidden_dim if hidden_dim is not None else in_dim // 2
+        self.fc = nn.Sequential(
+            nn.Linear(in_dim, mid_dim),
             nn.SiLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, 4),
+            nn.Linear(mid_dim, 4),
         )
+        # Physics-regularized initialization preventing evidence collapse
+        nn.init.xavier_uniform_(self.fc[0].weight)
+        nn.init.zeros_(self.fc[0].bias)
+        nn.init.xavier_uniform_(self.fc[2].weight)
+        # softplus(0.54) ~ 1.0, initializing v ~ 1.1, alpha ~ 2.2, beta ~ 1.05
+        self.fc[2].bias.data = torch.tensor([0.0, 0.54, 0.54, 0.54])
+
+    @property
+    def mlp(self) -> nn.Sequential:
+        """Alias for fc sequence for backward compatibility."""
+        return self.fc
 
     def forward(
         self, x: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        out = self.mlp(x)
+        out = self.fc(x)
         gamma = out[:, 0:1]
-        v = F.softplus(out[:, 1:2]) + 1e-6
-        alpha = F.softplus(out[:, 2:3]) + 1.0 + 1e-6
-        beta = F.softplus(out[:, 3:4]) + 1e-6
+        v = F.softplus(out[:, 1:2]) + 0.1
+        alpha = F.softplus(out[:, 2:3]) + 1.2
+        beta = F.softplus(out[:, 3:4]) + 0.05
         return gamma, v, alpha, beta
 
     @staticmethod

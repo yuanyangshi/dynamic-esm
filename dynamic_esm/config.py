@@ -84,14 +84,6 @@ class Config:
     LAMBDA_RANK: float = 0.5
     RANKING_MARGIN: float = 0.5
 
-    # -------------------------------------------------------------
-    # Remote / Cloud Sync (e.g., Kaggle, Hugging Face)
-    # -------------------------------------------------------------
-    PUSH_TO_REMOTE: bool = False
-    DATASET_REF: Optional[str] = field(
-        default_factory=lambda: os.environ.get("DATASET_REF", None)
-    )
-    MAX_RUNTIME_SEC: float = 11.5 * 3600
 
     def make_dirs(self):
         """Create output directories if they do not exist."""

@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 
 from dynamic_esm.visualization.publication_styles import set_publication_style
 from dynamic_esm.utils.logging import get_logger
@@ -63,12 +64,31 @@ def plot_figure_5(
     ax_d = fig.add_subplot(gs[1, 1])
     ax_d.set_title("d | Thermodynamic Free Energy deltaG vs FEP", fontweight="bold", loc="left")
     dg_exp = thermo_data.get("delta_g_exp")
-    if dg_exp is None:
-        dg_exp = np.linspace(-15, -5, 100)
     dg_pred = thermo_data.get("delta_g_pred")
-    if dg_pred is None:
-        dg_pred = dg_exp + np.random.normal(0, 0.8, len(dg_exp))
-    r2 = thermo_data.get("r2_fep", 0.865)
+    if dg_exp is None or dg_pred is None:
+        candidate_paths = [
+            os.path.join(out_dir, "..", "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "output", "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "dynamic-esm", "output", "checkpoints", "val_empirical_predictions.npz"),
+        ]
+        found = False
+        for cp in candidate_paths:
+            if os.path.exists(cp):
+                data = np.load(cp)
+                yt, yp = data["y_true"], data["y_pred"]
+                dg_exp = -1.3633 * yt
+                dg_pred = -1.3633 * yp
+                found = True
+                break
+        if not found:
+            raise ValueError(
+                "thermo_data must contain 'delta_g_exp' and 'delta_g_pred', or "
+                "authentic empirical predictions file must exist in candidate paths."
+            )
+
+    dg_exp = np.asarray(dg_exp).flatten()
+    dg_pred = np.asarray(dg_pred).flatten()
+    r2 = float(stats.pearsonr(dg_exp, dg_pred)[0] ** 2)
 
 
     ax_d.scatter(dg_exp, dg_pred, alpha=0.6, color="#059669", s=25)

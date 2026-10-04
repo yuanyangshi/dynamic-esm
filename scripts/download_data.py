@@ -72,6 +72,7 @@ def print_dataset_sources():
 def parse_args():
     parser = argparse.ArgumentParser(description="Dynamic-ESM dataset download assistant.")
     parser.add_argument("--download-pdbs", action="store_true", help="Download case study PDBs from RCSB.")
+    parser.add_argument("--info", action="store_true", help="Print official dataset sources and instructions.")
     parser.add_argument("--target-dir", type=str, default="./data/pdbs", help="Directory to save downloaded PDBs.")
     return parser.parse_args()
 
