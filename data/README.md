@@ -4,6 +4,22 @@ This directory contains instructions and direct download links for all datasets 
 
 ---
 
+## 0. Pre-trained Checkpoints & Preprocessed Dynamic Data (Direct Cloud Downloads)
+
+For quick inference or reproduction without reprocessing terabyte-scale raw trajectory files:
+
+- **Pre-trained Checkpoints & Workspace (NB3)**:
+  - **Kaggle Dataset**: [https://www.kaggle.com/datasets/shixinguo/nb3-workspace](https://www.kaggle.com/datasets/shixinguo/nb3-workspace)
+  - Contains: `dynamic_esm_main_best.ckpt` (Epoch 47 global optimal checkpoint, validation loss = 4.888) and full training logs.
+  - Recommended destination: Save to `./output/checkpoints/dynamic_esm_main_best.ckpt` or root `./output/`.
+
+- **Preprocessed 4D-QM Trajectories & Feature Archives (NB1)**:
+  - **Kaggle Execution Output**: [https://www.kaggle.com/code/shixinguo/nb1-20260809/output](https://www.kaggle.com/code/shixinguo/nb1-20260809/output)
+  - Contains: Preprocessed PyTorch Geometric `.pt` graph chunks, extracted ESM-2 representations, and MMseqs2 30% sequence identity cluster splits.
+  - Recommended destination: Extract to `./data/processed_pt/` or `./output/processed_pt/`.
+
+---
+
 ## 1. MISATO Molecular Dynamics & Quantum Chemistry Dataset
 
 The primary training dataset consists of multi-nanosecond molecular dynamics trajectories and quantum chemical (QM) polarizability calculations from the **MISATO** database.

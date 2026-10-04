@@ -1,8 +1,11 @@
 cff-version: 1.2.0
 message: "If you use Dynamic-ESM in your research, please cite it as below."
 authors:
-  - family-names: "Shi"
-    given-names: "Yuanyang"
+  - family-names: "Guo"
+    given-names: "Shi-Xin"
+    email: "gsx112233hs@163.com"
+  - family-names: "Zhang"
+    given-names: "Xiao-Na"
 title: "Dynamic-ESM: 4D Spatiotemporal SE(3)-Equivariant Dynamic Protein Language Model for Drug-Target Affinity Prediction"
 version: 1.0.0
 date-released: 2026-10-01
