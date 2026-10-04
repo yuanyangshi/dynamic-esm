@@ -70,7 +70,7 @@ class Config:
     BACKBONE_LR: float = 5e-5
     ESM_LORA_LR: float = 2e-4
     WEIGHT_DECAY: float = 1e-4
-    NUM_EPOCHS: int = 30
+    NUM_EPOCHS: int = 50
     PATIENCE: int = 7
     GRAD_ACCUM_STEPS: int = 2
     USE_AMP: bool = True

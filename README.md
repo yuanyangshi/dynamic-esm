@@ -111,10 +111,10 @@ pip install -e .
 python scripts/run_preprocessing.py --input-dir ./data --output-dir ./output/processed_pt
 
 # 2. Pretrain 4D-QM EST-GNN backbone with self-supervised physical restoration
-python scripts/run_pretrain.py --data-dir ./output/processed_pt --epochs 30
+python scripts/run_pretrain.py --data-dir ./output/processed_pt --epochs 50
 
 # 3. Fine-tune end-to-end Dynamic-ESM with Evidential Deep Learning
-python scripts/run_finetune.py --data-dir ./output/processed_pt --epochs 30
+python scripts/run_finetune.py --data-dir ./output/processed_pt --epochs 50
 
 # 4. Run CASF-2016 benchmarking and physical ablation
 python scripts/run_benchmark.py --output-dir ./output

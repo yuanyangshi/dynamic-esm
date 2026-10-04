@@ -37,7 +37,7 @@ python scripts/run_preprocessing.py \
 python scripts/run_pretrain.py \
     --data-dir ./output/processed_pt \
     --checkpoint-dir ./output/checkpoints \
-    --epochs 30
+    --epochs 50
 ```
 
 ### Step 3: End-to-End Multimodal Fine-Tuning
@@ -47,7 +47,7 @@ python scripts/run_finetune.py \
     --pretrain-dir ./output/checkpoints \
     --checkpoint-dir ./output/checkpoints \
     --figures-dir ./output/figures \
-    --epochs 30
+    --epochs 50
 ```
 
 ### Step 4: CASF-2016 Benchmarking & Physical Ablation
