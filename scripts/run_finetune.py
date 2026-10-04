@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("--pretrain-dir", type=str, default="./output/checkpoints", help="Directory with pre-trained backbone.")
     parser.add_argument("--checkpoint-dir", type=str, default="./output/checkpoints", help="Directory to save checkpoints.")
     parser.add_argument("--figures-dir", type=str, default="./output/figures", help="Directory to save publication figures.")
-    parser.add_argument("--epochs", type=int, default=30, help="Number of fine-tuning epochs.")
+    parser.add_argument("--epochs", type=int, default=50, help="Number of fine-tuning epochs.")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size per training step.")
     parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate.")
     return parser.parse_args()

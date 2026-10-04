@@ -25,7 +25,7 @@ training:
   backbone_lr: 5e-5
   esm_lora_lr: 2e-4
   weight_decay: 1e-4
-  num_epochs: 30
+  num_epochs: 50
   grad_accum_steps: 2
   use_amp: true
   seed: 42
