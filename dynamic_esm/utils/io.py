@@ -55,22 +55,50 @@ def safe_load_checkpoint(
     logger.info(f"Loading checkpoint from: {resolved_path}")
     try:
         try:
+            from dynamic_esm.config import Config
+            import sys
+            if "__main__" in sys.modules and not hasattr(sys.modules["__main__"], "Config"):
+                sys.modules["__main__"].Config = Config
+            if hasattr(torch.serialization, "add_safe_globals"):
+                torch.serialization.add_safe_globals([Config])
+        except Exception:
+            pass
+
+        try:
             ckpt = torch.load(resolved_path, map_location=device, weights_only=False)
         except TypeError:
             ckpt = torch.load(resolved_path, map_location=device)
         state_dict = ckpt.get("state_dict", ckpt)
 
-        # Clean prefix mismatches (e.g. from Lightning wrapper 'model.')
+        # Clean prefix mismatches (e.g. from Lightning wrapper 'model.', 'module.')
         cleaned_dict = {}
         for k, v in state_dict.items():
-            if k.startswith("model."):
-                cleaned_dict[k[6:]] = v
-            else:
-                cleaned_dict[k] = v
+            clean_k = k
+            for prefix in ["model.", "module."]:
+                if clean_k.startswith(prefix):
+                    clean_k = clean_k[len(prefix):]
+            cleaned_dict[clean_k] = v
+
+        # If loading into a standalone backbone, strip est_gnn. or backbone. prefix if present
+        if not hasattr(model, "est_gnn") and any(k.startswith("est_gnn.") for k in cleaned_dict):
+            cleaned_dict = {
+                (k[8:] if k.startswith("est_gnn.") else k): v
+                for k, v in cleaned_dict.items()
+            }
+        elif not hasattr(model, "backbone") and any(k.startswith("backbone.") for k in cleaned_dict):
+            cleaned_dict = {
+                (k[9:] if k.startswith("backbone.") else k): v
+                for k, v in cleaned_dict.items()
+            }
+
+        # Dynamically attach tensor_input_adapter if present in state_dict for standalone backbone
+        if hasattr(model, "tensor_input_adapter") and model.tensor_input_adapter is None:
+            if "tensor_input_adapter.weight" in cleaned_dict or "est_gnn.tensor_input_adapter.weight" in cleaned_dict:
+                model.tensor_input_adapter = nn.Linear(model.hidden_dim, model.hidden_dim).to(device)
 
         missing, unexpected = model.load_state_dict(cleaned_dict, strict=strict)
         logger.info(
-            f"Checkpoint loaded successfully. (Missing keys: {len(missing)}, Unexpected keys: {len(unexpected)})"
+            f"Checkpoint loaded successfully from {resolved_path}. (Missing keys: {len(missing)}, Unexpected keys: {len(unexpected)})"
         )
         return True
     except Exception as e:

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 import seaborn as sns
 
 from dynamic_esm.visualization.publication_styles import set_publication_style
@@ -36,13 +37,32 @@ def plot_figure_2(
     ax_a = fig.add_subplot(gs[0, 0])
     ax_a.set_title("a | CASF-2016 Correlation (Rp)", fontweight="bold", loc="left")
     if y_true is None or y_pred is None:
-        rng = np.random.default_rng(42)
-        y_true = rng.uniform(4.0, 11.0, size=285)
-        y_pred = y_true + rng.normal(0, 0.45, size=285)
+        candidate_paths = [
+            os.path.join(out_dir, "..", "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "output", "checkpoints", "val_empirical_predictions.npz"),
+            os.path.join(os.getcwd(), "dynamic-esm", "output", "checkpoints", "val_empirical_predictions.npz"),
+        ]
+        found = False
+        for cp in candidate_paths:
+            if os.path.exists(cp):
+                data = np.load(cp)
+                y_true = data["y_true"]
+                y_pred = data["y_pred"]
+                found = True
+                break
+        if not found:
+            raise ValueError(
+                "y_true and y_pred must be provided to plot_figure_2. "
+                "Genuine empirical predictions file not found in candidate paths."
+            )
+
+    y_true = np.asarray(y_true).flatten()
+    y_pred = np.asarray(y_pred).flatten()
+    rp_val = float(stats.pearsonr(y_true, y_pred)[0])
 
     ax_a.scatter(y_true, y_pred, alpha=0.6, color="#2563EB", edgecolors="none", s=25)
     m, b = np.polyfit(y_true, y_pred, 1)
-    ax_a.plot(y_true, m * y_true + b, color="#DC2626", lw=1.8, label=f"Fit (Rp = 0.842)")
+    ax_a.plot(y_true, m * y_true + b, color="#DC2626", lw=1.8, label=f"Fit (Rp = {rp_val:.3f})")
     ax_a.set_xlabel("Experimental pKd")
     ax_a.set_ylabel("Dynamic-ESM Predicted pKd")
     ax_a.legend(frameon=True)

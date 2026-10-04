@@ -36,3 +36,17 @@ python scripts/run_benchmark.py \
     --predictions-file output/checkpoints/val_empirical_predictions.npz \
     --output-dir output
 ```
+
+---
+
+## 4. Grounded Literature Citations
+
+All benchmark foundations are strictly grounded against peer-reviewed publications verified via OpenAlex and arXiv:
+
+1. **CASF-2016 Benchmark**:
+   - Su, M., Yang, Q., Du, Y., Feng, G., Liu, Z., Li, Y., & Wang, R. (2018). *Comparative Assessment of Scoring Functions: The CASF-2016 Update*. **Journal of Chemical Information and Modeling**, 59(2), 895–913. [DOI: 10.1021/acs.jcim.8b00545](https://doi.org/10.1021/acs.jcim.8b00545)
+2. **MISATO Physical Trajectory Dataset**:
+   - Siebenmorgen, T., et al. (2024). *MISATO: machine learning dataset of protein–ligand complexes for structure-based drug discovery*. **Nature Computational Science**, 4, 380–393. [DOI: 10.1038/s43588-024-00627-2](https://doi.org/10.1038/s43588-024-00627-2)
+3. **ESM-2 Protein Language Model**:
+   - Lin, Z., et al. (2023). *Evolutionary-scale prediction of atomic-level protein structure with a language model*. **Science**, 379(6637), 1123–1130. [DOI: 10.1126/science.ade2574](https://doi.org/10.1126/science.ade2574)
+

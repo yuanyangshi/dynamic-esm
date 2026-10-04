@@ -41,8 +41,20 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
     os.makedirs(pml_dir, exist_ok=True)
 
-    pdb_files = sorted(glob.glob(os.path.join(args.pdb_dir, "*.pdb")))
-    logger.info(f"Found {len(pdb_files)} PDB case files in {args.pdb_dir}.")
+    pdb_dir = args.pdb_dir
+    if not os.path.isdir(pdb_dir):
+        candidate_dirs = [
+            os.path.join(os.getcwd(), "dynamic-esm", "data", "pdbs"),
+            os.path.join(os.getcwd(), "data", "pdbs"),
+            os.path.join(os.path.dirname(__file__), "..", "data", "pdbs"),
+        ]
+        for cd in candidate_dirs:
+            if os.path.isdir(cd):
+                pdb_dir = cd
+                break
+
+    pdb_files = sorted(glob.glob(os.path.join(pdb_dir, "*.pdb")))
+    logger.info(f"Found {len(pdb_files)} PDB case files in {pdb_dir}.")
 
     data_cases = {}
     for pdb_path in pdb_files:

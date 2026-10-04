@@ -5,7 +5,7 @@ Unit tests for data transformations and coordinate processing.
 import torch
 from torch_geometric.data import Data
 
-from dynamic_esm.data.transforms import CenterTrajectory, AddGaussianNoise
+from dynamic_esm.data.transforms import CenterTrajectory, AddGaussianNoise, center_trajectory
 
 
 def test_center_trajectory():
@@ -13,13 +13,16 @@ def test_center_trajectory():
         [[10.0, 10.0, 10.0], [20.0, 20.0, 20.0]],
         [[12.0, 12.0, 12.0], [22.0, 22.0, 22.0]]
     ])
-    data = Data(pos=pos)
+    # Test Data object with class
+    data = Data(pos=pos.clone())
     transform = CenterTrajectory()
     out = transform(data)
-
-    # Frame 0 mean should be centered to ~0
     f0_mean = out.pos[0].mean(dim=0)
     assert torch.allclose(f0_mean, torch.zeros(3), atol=1e-5)
+
+    # Test direct Tensor with function
+    pos_centered = center_trajectory(pos.clone())
+    assert torch.allclose(pos_centered[0].mean(dim=0), torch.zeros(3), atol=1e-5)
 
 
 def test_add_gaussian_noise():

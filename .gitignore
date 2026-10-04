@@ -47,6 +47,7 @@ val_empirical_predictions.npz
 
 # Environments and Secrets
 .env
+.env.*
 .venv
 env/
 venv/
@@ -55,8 +56,16 @@ ENV/
 kaggle.json
 token/
 tokens/
+*token*
+*账号*
 secrets/
 *.secret
+
+# Proprietary Research Proposals & Unpublished Drafts
+Dynamic_ESM_SCI_Proposal.md
+Kaggle_Experiment_Plan.md
+paper/
+scratch/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
