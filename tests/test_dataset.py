@@ -35,3 +35,13 @@ def test_dynamic_esm_dataset_and_collate():
         batch = custom_collate_fn([dataset[0], dataset[1]])
         assert batch is not None
         assert batch.num_graphs == 2
+
+
+def test_custom_collate_fn_node_first_orientation():
+    # Test collation when graphs have pos of shape (N, T, 3)
+    d1 = Data(x=torch.randn(10, 32), pos=torch.randn(10, 5, 3), y=torch.tensor([5.5]))
+    d2 = Data(x=torch.randn(15, 32), pos=torch.randn(15, 5, 3), y=torch.tensor([7.2]))
+    batch = custom_collate_fn([d1, d2])
+    assert batch is not None
+    assert batch.num_graphs == 2
+    assert batch.pos.shape == (5, 25, 3)  # Normalized to (T, N_total, 3)

@@ -57,7 +57,10 @@ class DynamicESM(nn.Module):
         if load_esm and esm_model_name:
             try:
                 import esm
-                esm_model, self.alphabet = esm.pretrained.esm2_t12_35M_UR50D()
+                if hasattr(esm.pretrained, esm_model_name):
+                    esm_model, self.alphabet = getattr(esm.pretrained, esm_model_name)()
+                else:
+                    esm_model, self.alphabet = esm.pretrained.load_model_and_alphabet(esm_model_name)
                 self.batch_converter = self.alphabet.get_batch_converter()
                 self.esm = inject_lora_into_esm(
                     esm_model, rank=lora_rank, alpha=lora_alpha, dropout=lora_dropout
@@ -192,15 +195,20 @@ class DynamicESMPretrainModule(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.cfg = cfg
+        node_in_dim = getattr(cfg, "NODE_IN_DIM", 494) if cfg else 494
+        hidden_dim = getattr(cfg, "GNN_HIDDEN_DIM", 128) if cfg else 128
+        num_layers = getattr(cfg, "NUM_GNN_LAYERS", 3) if cfg else 3
+        cutoff = getattr(cfg, "POCKET_RADIUS", 12.0) if cfg else 12.0
+        num_heads = getattr(cfg, "NUM_TEMPORAL_HEADS", 4) if cfg else 4
         self.backbone = DynamicESMBackbone(
-            node_in_dim=494,
-            hidden_dim=128,
-            num_layers=3,
-            cutoff=12.0,
-            num_heads=4,
+            node_in_dim=node_in_dim,
+            hidden_dim=hidden_dim,
+            num_layers=num_layers,
+            cutoff=cutoff,
+            num_heads=num_heads,
         )
-        self.coord_head = nn.Linear(128, 3)
-        self.velocity_head = nn.Linear(128, 3)
+        self.coord_head = nn.Linear(hidden_dim, 3)
+        self.velocity_head = nn.Linear(hidden_dim, 3)
 
     def forward(self, x, pos_trajectory):
         return self.backbone(x, pos_trajectory)
@@ -216,14 +224,48 @@ class DynamicESMPretrainModule(pl.LightningModule):
         pred_coords = self.coord_head(h)
         pred_velocity = self.velocity_head(h)
 
-        target_coords = pos_trajectory[-1] if pos_trajectory.dim() == 3 else pos_trajectory[:, -1]
+        if pos_trajectory.dim() == 3:
+            if pos_trajectory.size(0) == h.size(0) and pos_trajectory.size(1) != h.size(0):
+                target_coords = pos_trajectory[:, -1]
+                target_vel = noise[:, -1]
+            else:
+                target_coords = pos_trajectory[-1]
+                target_vel = noise[-1]
+        elif pos_trajectory.dim() == 4:
+            target_coords = pos_trajectory[:, -1]
+            target_vel = noise[:, -1]
+        else:
+            target_coords = pos_trajectory
+            target_vel = noise
+
         loss_coord = F.mse_loss(pred_coords, target_coords)
-        loss_vel = F.mse_loss(pred_velocity, noise[-1] if noise.dim() == 3 else noise[:, -1])
+        loss_vel = F.mse_loss(pred_velocity, target_vel)
         total_loss = loss_coord + 0.5 * loss_vel
 
         if getattr(self, "_trainer", None) is not None:
             self.log("train_loss", total_loss, prog_bar=True)
         return total_loss
+
+    def validation_step(self, batch, batch_idx):
+        x = batch.x
+        pos_trajectory = batch.pos
+        h, _ = self.backbone(x, pos_trajectory)
+        pred_coords = self.coord_head(h)
+
+        if pos_trajectory.dim() == 3:
+            if pos_trajectory.size(0) == h.size(0) and pos_trajectory.size(1) != h.size(0):
+                target_coords = pos_trajectory[:, -1]
+            else:
+                target_coords = pos_trajectory[-1]
+        elif pos_trajectory.dim() == 4:
+            target_coords = pos_trajectory[:, -1]
+        else:
+            target_coords = pos_trajectory
+
+        val_loss = F.mse_loss(pred_coords, target_coords)
+        if getattr(self, "_trainer", None) is not None:
+            self.log("val_loss", val_loss, prog_bar=True, sync_dist=True)
+        return val_loss
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.parameters(), lr=1e-4, weight_decay=1e-4)

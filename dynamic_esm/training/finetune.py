@@ -50,7 +50,12 @@ def evaluate_model(
                 continue
             x = batch.x.to(device)
             pos = batch.pos.to(device)
-            y = getattr(batch, "y", torch.zeros(1, 1)).to(device)
+            y = getattr(batch, "y", None)
+            if y is None:
+                bsz = getattr(batch, "num_graphs", 1)
+                y = torch.zeros(bsz, 1, device=device)
+            else:
+                y = y.to(device)
             if y.dim() == 1:
                 y = y.unsqueeze(-1)
 
@@ -108,9 +113,15 @@ def run_finetuning(cfg: Config) -> str:
     )
 
     logger.info("Instantiating Dynamic-ESM Model...")
+    in_node_dim = getattr(cfg, "NODE_IN_DIM", 494)
+    if len(train_dataset) > 0:
+        sample_item = train_dataset[0]
+        if sample_item is not None and hasattr(sample_item, "x") and sample_item.x is not None:
+            in_node_dim = sample_item.x.size(-1)
+
     model = DynamicESM(
         esm_model_name=cfg.ESM_MODEL_NAME,
-        node_in_dim=494,
+        node_in_dim=in_node_dim,
         gnn_hidden_dim=cfg.GNN_HIDDEN_DIM,
         cross_attn_dim=cfg.CROSS_ATTN_DIM,
         num_heads=cfg.NUM_CROSS_HEADS,
@@ -154,7 +165,12 @@ def run_finetuning(cfg: Config) -> str:
                 continue
             x = batch.x.to(device)
             pos = batch.pos.to(device)
-            y = getattr(batch, "y", torch.zeros(x.size(0), 1)).to(device)
+            y = getattr(batch, "y", None)
+            if y is None:
+                bsz = getattr(batch, "num_graphs", 1)
+                y = torch.zeros(bsz, 1, device=device)
+            else:
+                y = y.to(device)
             if y.dim() == 1:
                 y = y.unsqueeze(-1)
 
@@ -215,9 +231,10 @@ def run_finetuning(cfg: Config) -> str:
                 total_uncert=total_uncert_val,
             )
 
-    # Save training history
+    # Save training history to working and checkpoint directories
     history_df = pd.DataFrame(history_records)
     history_df.to_csv(os.path.join(cfg.WORKING_DIR, "finetune_history.csv"), index=False)
+    history_df.to_csv(os.path.join(cfg.CHECKPOINT_DIR, "finetune_history.csv"), index=False)
 
     logger.info(f"Fine-tuning complete. Best Val RMSE: {best_rmse:.4f}. Model: {best_ckpt_path}")
     return best_ckpt_path

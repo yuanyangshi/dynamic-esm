@@ -6,7 +6,7 @@ authors:
     email: "gsx112233hs@163.com"
   - family-names: "Zhang"
     given-names: "Xiao-Na"
-title: "Dynamic-ESM: 4D Spatiotemporal SE(3)-Equivariant Dynamic Protein Language Model for Drug-Target Affinity Prediction"
+title: "Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction"
 version: 1.0.0
 date-released: 2026-10-01
 url: "https://github.com/yuanyangshi/dynamic-esm"

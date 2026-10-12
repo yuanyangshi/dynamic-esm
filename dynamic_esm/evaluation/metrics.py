@@ -115,12 +115,15 @@ def vectorized_bootstrap_ci(
 
     results = {}
     for name, arr in [("Rp", rp_list), ("Rho", rho_list), ("RMSE", rmse_list), ("MAE", mae_list)]:
-        arr = np.array(arr)
-        results[name] = (
-            float(np.mean(arr)),
-            float(np.percentile(arr, alpha_low)),
-            float(np.percentile(arr, alpha_high)),
-        )
+        if len(arr) == 0:
+            results[name] = (0.0, 0.0, 0.0)
+        else:
+            arr_np = np.array(arr)
+            results[name] = (
+                float(np.mean(arr_np)),
+                float(np.percentile(arr_np, alpha_low)),
+                float(np.percentile(arr_np, alpha_high)),
+            )
     return results
 
 

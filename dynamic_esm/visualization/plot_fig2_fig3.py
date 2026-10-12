@@ -80,14 +80,16 @@ def plot_figure_2(
     ax_b.set_xlabel("Pearson Correlation (Rp)")
     ax_b.invert_yaxis()
 
-    # Panel c: Scaffold-Hopping OOD Performance
+    # Panel c: Scaffold-Hopping OOD Performance (Bemis-Murcko & Morgan Tanimoto)
     ax_c = fig.add_subplot(gs[0, 2])
-    ax_c.set_title("c | Bemis-Murcko Scaffold Hopping (OOD)", fontweight="bold", loc="left")
-    scaffolds = ["Seen Scaffolds", "Unseen Scaffolds", "Strict Novelty"]
-    rp_scaff = [0.854, 0.812, 0.786]
-    ax_c.bar(scaffolds, rp_scaff, color=["#10B981", "#3B82F6", "#F59E0B"], width=0.5)
+    ax_c.set_title("c | Chemical Space Divergence (Scaffold-Hopping)", fontweight="bold", loc="left")
+    scaffolds = ["High Similarity\n(T >= 0.50, N=1,058)", "Moderate Divergence\n(0.30 <= T < 0.50, N=336)", "Deep Scaffold-Hop\n(T < 0.30, N=282)"]
+    rp_scaff = [0.543, 0.527, 0.532]
+    ax_c.bar(scaffolds, rp_scaff, color=["#10B981", "#3B82F6", "#F59E0B"], width=0.48)
     ax_c.set_ylabel("Pearson Rp")
-    ax_c.set_ylim(0.5, 1.0)
+    ax_c.set_ylim(0.3, 0.7)
+    for idx_s, val_s in enumerate(rp_scaff):
+        ax_c.text(idx_s, val_s + 0.015, f"Rp={val_s:.3f}", ha="center", fontsize=8.5, fontweight="bold")
 
     png_path = os.path.join(out_dir, "Figure_2_CASF2016_SOTA_ScaffoldHopping.png")
     pdf_path = os.path.join(out_dir, "Figure_2_CASF2016_SOTA_ScaffoldHopping.pdf")
@@ -116,14 +118,16 @@ def plot_figure_3(df_ablation: pd.DataFrame, out_dir: str) -> Tuple[str, str]:
     # 2. QM Electrostatics
     df_qm = df_ablation[df_ablation["Category"].isin(["Full Model", "Quantum Electrostatics"])]
     axes[1].set_title("b | Quantum Electrostatic Polarizability", fontweight="bold", loc="left")
-    axes[1].bar(df_qm["Variant"], df_qm["Rp"], color=["#10B981", "#EF4444"], width=0.45)
+    colors_qm = ["#10B981", "#3B82F6", "#EF4444"][:len(df_qm)]
+    axes[1].bar(df_qm["Variant"], df_qm["Rp"], color=colors_qm, width=0.45)
     axes[1].set_ylabel("Pearson Rp (Higher is Better)")
     axes[1].tick_params(axis="x", rotation=25)
 
     # 3. Multimodal Fusion Architecture
     df_attn = df_ablation[df_ablation["Category"].isin(["Full Model", "Multimodal Fusion"])]
     axes[2].set_title("c | Cross-Modal Attention Architecture", fontweight="bold", loc="left")
-    axes[2].bar(df_attn["Variant"], df_attn["RMSE"], color=["#10B981", "#64748B", "#F59E0B"], width=0.5)
+    colors_attn = ["#10B981", "#64748B", "#F59E0B"][:len(df_attn)]
+    axes[2].bar(df_attn["Variant"], df_attn["RMSE"], color=colors_attn, width=0.5)
     axes[2].set_ylabel("RMSE")
     axes[2].tick_params(axis="x", rotation=25)
 
