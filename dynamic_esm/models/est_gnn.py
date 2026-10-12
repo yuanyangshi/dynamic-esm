@@ -157,18 +157,22 @@ class TemporalAttentionFusion(nn.Module):
         """Alias for backward compatibility."""
         return self.ffn
 
-    def forward(self, h_frames: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self, h_frames: torch.Tensor, pool: bool = True
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         h_frames: (N, T, hidden_dim) or (B, T, hidden_dim)
         Returns:
-            fused_h: (N, hidden_dim)
+            fused_h: (N, hidden_dim) if pool else (B, T, hidden_dim)
             attn_weights: (N, T, T)
         """
         attn_out, attn_weights = self.mha(h_frames, h_frames, h_frames)
         h_res = self.norm1(h_frames + attn_out)
         h_out = self.norm2(h_res + self.ffn(h_res))
-        fused_h = h_out.mean(dim=1)  # Temporal mean pooling
-        return fused_h, attn_weights
+        if pool:
+            fused_h = h_out.mean(dim=1)  # Temporal mean pooling
+            return fused_h, attn_weights
+        return h_out, attn_weights
 
 
 class DynamicESMBackbone(nn.Module):
@@ -311,9 +315,9 @@ class DynamicESMBackbone(nn.Module):
                 temporal_reps.append(torch.stack(frame_reps, dim=0))
 
             temporal_tensor = torch.stack(temporal_reps, dim=0)  # [B, T, hidden_dim]
-            fused_temporal, temporal_attn = self.temporal_fusion(temporal_tensor)
-            traj_summary = fused_temporal.mean(dim=1, keepdim=True)
-            final_geo = torch.cat([fused_temporal, traj_summary], dim=1)  # [B, T + 1, hidden_dim]
+            fused_frames, temporal_attn = self.temporal_fusion(temporal_tensor, pool=False)  # [B, T, hidden_dim]
+            traj_summary = fused_frames.mean(dim=1, keepdim=True)  # [B, 1, hidden_dim]
+            final_geo = torch.cat([fused_frames, traj_summary], dim=1)  # [B, T + 1, hidden_dim]
             return final_geo, temporal_attn
 
         # Case 1: Coordinate trajectory mode

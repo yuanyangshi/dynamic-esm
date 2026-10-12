@@ -59,6 +59,19 @@ def generate_pymol_script(
     critical_residues = critical_residues or []
     res_sel_str = "+".join(str(r) for r in critical_residues)
 
+    if res_sel_str:
+        hotspots_block = f"""# Highlight Clinically Critical Mutation Residues
+select hotspots, {base_name} and resi {res_sel_str}
+show sticks, hotspots
+show surface, hotspots
+set transparency, 0.4, hotspots
+label hotspots and name CA, "%s%s" % (resn, resi)
+set label_size, 14
+set label_color, black
+set label_font_id, 7"""
+    else:
+        hotspots_block = "# No specific mutation hotspots designated"
+
     pml_content = f"""# ==============================================================================
 # Dynamic-ESM Automated PyMOL Visualizer
 # System: {base_name}
@@ -87,15 +100,7 @@ show sticks, ligand
 set stick_radius, 0.28, ligand
 color green, ligand
 
-# Highlight Clinically Critical Mutation Residues
-select hotspots, {base_name} and resi {res_sel_str}
-show sticks, hotspots
-show surface, hotspots
-set transparency, 0.4, hotspots
-label hotspots and name CA, "%s%s" % (resn, resi)
-set label_size, 14
-set label_color, black
-set label_font_id, 7
+{hotspots_block}
 
 # Pocket Zoom & View
 orient ligand

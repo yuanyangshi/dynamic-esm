@@ -4,7 +4,7 @@ Molecular Dynamics for Generalizable Binding Affinity Prediction.
 """
 
 __version__ = "1.0.0"
-__author__ = "yuanyangshi"
+__author__ = "Shi-Xin Guo, Xiao-Na Zhang"
 
 
 from dynamic_esm.config import Config

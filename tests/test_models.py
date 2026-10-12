@@ -126,10 +126,35 @@ def test_dynamic_esm_model():
 
 def test_dynamic_esm_pretrain_module():
     module = DynamicESMPretrainModule()
-    batch = Data(x=torch.randn(10, 494), pos=torch.randn(5, 10, 3))
-    loss = module.training_step(batch, batch_idx=0)
-    assert loss.dim() == 0
-    assert not torch.isnan(loss)
-    assert loss.item() > 0
+    # Test trajectory-first orientation (T, N, 3)
+    batch_t_first = Data(x=torch.randn(10, 494), pos=torch.randn(5, 10, 3))
+    loss_t = module.training_step(batch_t_first, batch_idx=0)
+    assert loss_t.dim() == 0
+    assert not torch.isnan(loss_t)
+    assert loss_t.item() > 0
+
+    val_loss_t = module.validation_step(batch_t_first, batch_idx=0)
+    assert val_loss_t.dim() == 0
+    assert not torch.isnan(val_loss_t)
+
+    # Test node-first orientation (N, T, 3)
+    batch_n_first = Data(x=torch.randn(10, 494), pos=torch.randn(10, 5, 3))
+    loss_n = module.training_step(batch_n_first, batch_idx=0)
+    assert loss_n.dim() == 0
+    assert not torch.isnan(loss_n)
+    assert loss_n.item() > 0
+
+    val_loss_n = module.validation_step(batch_n_first, batch_idx=0)
+    assert val_loss_n.dim() == 0
+    assert not torch.isnan(val_loss_n)
+
+
+def test_backbone_4d_batched_tensor_mode():
+    backbone = DynamicESMBackbone(node_in_dim=32, hidden_dim=64, num_layers=2)
+    # B=2, T=4 frames, N=10 atoms, D=35 (3 coords + 32 features)
+    x_4d = torch.randn(2, 4, 10, 35)
+    fused_geo, temporal_attn = backbone(x_4d)
+    assert fused_geo.shape == (2, 5, 64)  # B, T + 1, hidden_dim
+    assert temporal_attn.shape == (2, 4, 4)
 
 

@@ -54,11 +54,12 @@ def run_backbone_pretraining(cfg: Config) -> str:
     logger.info("Instantiating DynamicESMPretrainModule...")
     module = DynamicESMPretrainModule(cfg=cfg)
 
+    has_val = len(val_dataset) > 0
     ckpt_callback = ModelCheckpoint(
         dirpath=cfg.CHECKPOINT_DIR,
         filename="backbone_pretrain_best",
         save_top_k=1,
-        monitor="train_loss",
+        monitor="val_loss" if has_val else "train_loss",
         mode="min",
     )
 
@@ -72,7 +73,11 @@ def run_backbone_pretraining(cfg: Config) -> str:
     )
 
     logger.info("Starting Backbone Pretraining...")
-    trainer.fit(module, train_dataloaders=train_loader)
+    trainer.fit(
+        module,
+        train_dataloaders=train_loader,
+        val_dataloaders=val_loader if has_val else None,
+    )
 
     best_path = ckpt_callback.best_model_path
     logger.info(f"Backbone pretraining completed. Best checkpoint: {best_path}")

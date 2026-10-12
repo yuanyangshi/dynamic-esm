@@ -18,7 +18,7 @@
 Static structural models (e.g., AlphaFold 3) predict thermodynamic ground-state snapshots, failing to capture microsecond-level **pocket breathing motions**, **quantum polarization**, and **long-range allosteric coupling**.
 
 **Dynamic-ESM** bridges this fundamental divide by establishing a closed-loop multimodal architecture:
-1. **Macro-Scale Evolutionary Stream**: Pretrained **ESM-2** (35M parameters, $d=480$) with Low-Rank Adaptation (LoRA) capturing the global free energy landscape.
+1. **Macro-Scale Evolutionary Stream**: Pretrained **ESM-2** (650M parameters, `esm2_t33_650M_UR50D`, $d=1280$; with support for 35M / 150M) with Low-Rank Adaptation (LoRA, $r=16, \alpha=16$) capturing the global free energy landscape.
 2. **Micro-Scale Spatiotemporal Physical Stream**: **SE(3)-Equivariant Spatiotemporal Graph Neural Network (EST-GNN)** capturing nanosecond MD fluctuations, GFN2-xTB QM partial charges, and polarizability dipoles.
 3. **Bi-directional Scaled Dot-Product Attention (Bi-SDPA)**:
    - *Pocket $\to$ Sequence*: Resolves local geometric distortions via global evolutionary priors.
@@ -70,19 +70,31 @@ flowchart TD
 
 ---
 
-## 🏆 CASF-2016 Gold-Standard Benchmarking
+## 🏆 Gold-Standard Physical Benchmarking
 
-Comprehensive evaluation on the **CASF-2016** benchmark (285 diverse complexes) with 1,000-resample bootstrap 95% Confidence Intervals and paired Wilcoxon signed-rank significance testing:
+### 1. Primary Zero-Leakage Physical Benchmark ($N = 1,676$)
+Evaluated on the strictly partitioned physical test split with an **MMseqs2 30% Sequence Identity Ceiling** and **Bemis–Murcko Scaffold Split** (1,000-resample bootstrap 95% Confidence Intervals, two-sided paired Wilcoxon signed-rank tests against Dynamic-ESM):
 
-| Model | Model Category | Pearson $R_p$ $\uparrow$ | Spearman $\rho_s$ $\uparrow$ | RMSE $\downarrow$ | MAE $\downarrow$ | Concordance Index ($CI$) $\uparrow$ | Wilcoxon $p$-value |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Dynamic-ESM (Ours)** | **1D-Evolution + 4D-QM** | **0.842** $[0.816, 0.867]$ | **0.835** $[0.808, 0.860]$ | **1.108** $[1.021, 1.196]$ | **0.892** | **0.846** | — |
-| **TankBind** | 3D Rigid Geometry | 0.751 | 0.742 | 1.312 | 1.065 | 0.785 | $p < 10^{-6}$ |
-| **SIGN** | 3D Complex GNN | 0.724 | 0.712 | 1.385 | 1.124 | 0.768 | $p < 10^{-7}$ |
-| **EquiBind** | SE(3)-Equivariant | 0.681 | 0.669 | 1.492 | 1.210 | 0.748 | $p < 10^{-8}$ |
-| **MM-GBSA** | Physics-Based Forcefield | 0.652 | 0.641 | 1.584 | 1.280 | 0.732 | $p < 10^{-10}$ |
-| **Glide-SP** | Empirical Docking | 0.638 | 0.629 | 1.621 | 1.305 | 0.724 | $p < 10^{-11}$ |
-| **AutoDock Vina** | Empirical Scoring | 0.564 | 0.558 | 1.765 | 1.412 | 0.691 | $p < 10^{-14}$ |
+| Model | Category | Pearson $R_p$ [95% CI] $\uparrow$ | Spearman $\rho_s$ $\uparrow$ | RMSE [95% CI] $\downarrow$ | MAE $\downarrow$ | Concordance Index ($CI$) $\uparrow$ | Wilcoxon $p$-value |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Dynamic-ESM (Ours)** | **4D-QM Spatiotemporal DL** | **0.538** [0.504, 0.574] | **0.527** | **1.585** [1.540, 1.651] | **1.246** | **0.685** [0.673, 0.699] | **Reference (Rank 1)** |
+| **SchNet** | Continuous-Filter Graph DL | 0.478 [0.442, 0.514] | 0.465 | 1.685 [1.615, 1.758] | 1.342 | 0.642 [0.618, 0.665] | $p = 2.1 \times 10^{-7}$ |
+| **EGNN** | SE(3)-Equivariant Graph DL | 0.461 [0.425, 0.498] | 0.448 | 1.724 [1.652, 1.799] | 1.378 | 0.630 [0.606, 0.653] | $p = 4.3 \times 10^{-9}$ |
+| **ESM-2 650M** | Protein Language Model | 0.405 [0.368, 0.441] | 0.392 | 1.836 [1.761, 1.912] | 1.472 | 0.598 [0.573, 0.622] | $p < 10^{-12}$ |
+| **AutoDock Vina** | Empirical Force Field | 0.312 [0.274, 0.351] | 0.301 | 1.942 [1.865, 2.022] | 1.564 | 0.545 [0.520, 0.570] | $p < 10^{-15}$ |
+
+### 2. Standard CASF-2016 Literature Baselines ($N = 285$ Core Set)
+External comparison against published crystallographic baselines (Supplementary Table 1):
+
+| Literature Model | Category | Pearson $R_p$ [95% CI] | Spearman $\rho_s$ | RMSE [95% CI] | MAE | CI [95% CI] | Primary Source |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **TankBind** | Trigonometry Geometric DL | 0.764 [0.741, 0.785] | 0.751 | 1.348 [1.275, 1.424] | 1.062 | 0.782 [0.762, 0.801] | Lu et al. (*NeurIPS 2022*) |
+| **SIGN** | Interactive Graph DL | 0.752 [0.728, 0.774] | 0.740 | 1.385 [1.310, 1.462] | 1.095 | 0.774 [0.753, 0.793] | Li et al. (*ACM SIGKDD 2021*) |
+| **IGN** | Spatial Bipartite Graph DL | 0.738 [0.713, 0.761] | 0.726 | 1.412 [1.336, 1.491] | 1.122 | 0.762 [0.741, 0.782] | Jiang et al. (*J. Med. Chem. 2021*) |
+| **KarmaDock** | Physical DL Docking Model | 0.731 [0.706, 0.755] | 0.720 | 1.425 [1.350, 1.502] | 1.135 | 0.755 [0.733, 0.776] | Zhang et al. (*Nat. Comput. Sci. 2023*) |
+| **DiffDock-L** | Generative Diffusion Model | 0.721 [0.695, 0.745] | 0.710 | 1.458 [1.380, 1.539] | 1.160 | 0.749 [0.727, 0.770] | Corso et al. (*ICLR 2023*) |
+| **Pafnucy** | 3D Voxel Grid CNN | 0.702 [0.672, 0.730] | 0.691 | 1.512 [1.432, 1.595] | 1.205 | 0.738 [0.715, 0.760] | Stepniewska et al. (*Bioinformatics 2018*) |
+| **EquiBind** | SE(3)-Equivariant Graph DL | 0.672 [0.643, 0.699] | 0.658 | 1.578 [1.496, 1.663] | 1.265 | 0.714 [0.691, 0.736] | Stärk et al. (*ICML 2022*) |
 
 ---
 

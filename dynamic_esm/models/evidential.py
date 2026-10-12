@@ -110,11 +110,13 @@ def pairwise_ranking_loss(
     """
     Pairwise margin ranking loss to optimize Spearman correlation and virtual screening power.
     """
-    if y_true.size(0) < 2:
+    if y_true.numel() < 2:
         return torch.tensor(0.0, device=y_true.device, requires_grad=True)
 
-    y_diff = y_true.unsqueeze(1) - y_true.unsqueeze(0)  # (N, N)
-    pred_diff = gamma.unsqueeze(1) - gamma.unsqueeze(0)  # (N, N)
+    y_vec = y_true.view(-1, 1)
+    gamma_vec = gamma.view(-1, 1)
+    y_diff = y_vec - y_vec.t()  # (N, N)
+    pred_diff = gamma_vec - gamma_vec.t()  # (N, N)
 
     # Target sign: 1 if y_i > y_j, -1 if y_i < y_j, 0 if equal
     target = torch.sign(y_diff)

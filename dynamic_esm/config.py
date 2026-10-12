@@ -49,8 +49,11 @@ class Config:
     # -------------------------------------------------------------
     ESM_MODEL_NAME: str = "esm2_t12_35M_UR50D"
     ESM_EMBED_DIM: int = 480
+    NODE_IN_DIM: int = 494
     GNN_HIDDEN_DIM: int = 128
     CROSS_ATTN_DIM: int = 256
+    NUM_GNN_LAYERS: int = 4
+    NUM_TEMPORAL_HEADS: int = 4
     NUM_CROSS_HEADS: int = 4
     NUM_CROSS_LAYERS: int = 2
     DROPOUT: float = 0.1

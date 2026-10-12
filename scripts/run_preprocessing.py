@@ -44,9 +44,12 @@ def main():
         logger.warning(f"No MD_split_*.hdf5 files found in {args.input_dir}. Please place MISATO files there.")
         return
 
-    logger.info(f"Found {len(split_files)} split files to process.")
-    for split_path in split_files:
-        preprocessor.run_split(split_path)
+    try:
+        logger.info(f"Found {len(split_files)} split files to process.")
+        for split_path in split_files:
+            preprocessor.run_split(split_path)
+    finally:
+        preprocessor.close()
 
     logger.info("Preprocessing complete.")
 

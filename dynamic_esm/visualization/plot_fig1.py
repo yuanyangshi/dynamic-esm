@@ -82,16 +82,21 @@ def generate_figure_1(
     ax_c.set_title("c | Multimodal Fine-Tuning Convergence", fontweight="bold", loc="left")
     
     csv_candidates = [
+        os.path.join(out_dir, "..", "checkpoints", "finetune_history.csv"),
+        os.path.join(out_dir, "..", "finetune_history.csv"),
         os.path.join(out_dir, "..", "checkpoints", "finetune_cumulative_history.csv"),
+        os.path.join(os.getenv("DYNAMIC_ESM_OUTPUT_DIR", "./output"), "checkpoints", "finetune_history.csv"),
         os.path.join(os.getenv("DYNAMIC_ESM_OUTPUT_DIR", "./output"), "checkpoints", "finetune_cumulative_history.csv"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "output", "checkpoints", "finetune_history.csv"),
         os.path.join(os.path.dirname(__file__), "..", "..", "output", "checkpoints", "finetune_cumulative_history.csv"),
+        "./output/checkpoints/finetune_history.csv",
         "./output/checkpoints/finetune_cumulative_history.csv",
     ]
     hist_df = None
     if history is not None and "epoch" in history:
         epochs = np.array(history["epoch"])
         train_l = np.array(history["train_loss"])
-        val_l = np.array(history.get("val_loss", train_l))
+        val_l = np.array(history.get("val_loss", history.get("val_rmse", train_l)))
     else:
         for cp in csv_candidates:
             if os.path.exists(cp):
@@ -103,7 +108,12 @@ def generate_figure_1(
             hist_df = hist_df[hist_df["epoch"] <= 50]
             epochs = hist_df["epoch"].values
             train_l = hist_df["train_loss"].values
-            val_l = hist_df["val_loss"].values
+            if "val_loss" in hist_df.columns:
+                val_l = hist_df["val_loss"].values
+            elif "val_rmse" in hist_df.columns:
+                val_l = hist_df["val_rmse"].values
+            else:
+                val_l = train_l
         else:
             epochs = np.arange(1, 51)
             train_l = 1.8 * np.exp(-epochs / 12.0) + 0.35

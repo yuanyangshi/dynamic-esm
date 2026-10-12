@@ -97,12 +97,22 @@ def custom_collate_fn(batch: List[Data]) -> Optional[Batch]:
     )
 
     if has_3d_pos:
-        orig_positions = [d.pos for d in valid_batch]
+        orig_positions = []
+        for d in valid_batch:
+            pos_t = d.pos
+            if pos_t.size(1) < pos_t.size(0) and pos_t.size(1) <= 10:
+                pos_t = pos_t.permute(1, 0, 2)
+            orig_positions.append(pos_t)
         batched_pos = torch.cat(orig_positions, dim=1)
 
         has_noisy = hasattr(valid_batch[0], "noisy_pos") and valid_batch[0].noisy_pos is not None
         if has_noisy:
-            orig_noisy = [d.noisy_pos for d in valid_batch]
+            orig_noisy = []
+            for d in valid_batch:
+                n_pos = d.noisy_pos
+                if n_pos is not None and n_pos.dim() == 3 and n_pos.size(1) < n_pos.size(0) and n_pos.size(1) <= 10:
+                    n_pos = n_pos.permute(1, 0, 2)
+                orig_noisy.append(n_pos)
             batched_noisy = torch.cat(orig_noisy, dim=1)
 
         for d in valid_batch:

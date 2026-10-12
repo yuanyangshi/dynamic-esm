@@ -64,7 +64,7 @@ def main():
     logger.info(f"Loaded {len(y_true)} authentic empirical predictions from {pred_path}")
 
     # 1. Virtual Screening Evaluation
-    df_screen, _ = evaluate_virtual_screening_targets(y_true, y_pred)
+    df_screen, roc_dict = evaluate_virtual_screening_targets(y_true, y_pred)
     df_screen.to_csv(os.path.join(table_dir, "Table_3_Virtual_Screening_Enrichment.csv"), index=False)
 
     # 2. AF3 Conformation Rectification & Thermodynamic deltaG
@@ -72,7 +72,7 @@ def main():
     df_rect.to_csv(os.path.join(table_dir, "Table_4_AF3_Conformation_Rectification.csv"), index=False)
 
     # 3. Figure 5 Export
-    plot_figure_5(df_screen, df_rect, thermo_data, fig_dir)
+    plot_figure_5(df_screen, df_rect, thermo_data, fig_dir, roc_dict=roc_dict)
     logger.info("Virtual screening & AF3 rectification pipeline complete. Figure 5 exported.")
 
 
