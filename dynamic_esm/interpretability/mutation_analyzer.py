@@ -29,10 +29,10 @@ CLINICAL_BENCHMARK_CASES = {
     },
     "3QRJ": {
         "target": "Abl T315I",
-        "drug": "Ponatinib",
+        "drug": "Rebastinib (DCC-2036)",
         "key_mutations": ["T315I"],
         "critical_residues": [315, 286, 381],
-        "mechanism": "Overcoming bulky isoleucine gatekeeper mutation via ethynyl linker",
+        "mechanism": "Conformational switch-control pocket navigation and diarylurea binding around bulky isoleucine gatekeeper",
     },
     "6LUD": {
         "target": "EGFR T790M/C797S",

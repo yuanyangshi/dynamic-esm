@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 setup(
     name="dynamic-esm",
     version="1.0.0",
-    description="Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction",
+    description="Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Augmented Molecular Dynamics Enables Generalizable Binding Affinity Prediction and Mechanistic Discovery",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Shi-Xin Guo, Xiao-Na Zhang",
-    author_email="gsx112233hs@163.com",
+    author_email="noreply@example.com",
     url="https://github.com/yuanyangshi/dynamic-esm",
     packages=find_packages(),
     python_requires=">=3.9",

@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dynamic-esm"
 version = "1.0.0"
-description = "Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction"
+description = "Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Augmented Molecular Dynamics Enables Generalizable Binding Affinity Prediction and Mechanistic Discovery"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "Shi-Xin Guo", email = "gsx112233hs@163.com" },
+    { name = "Shi-Xin Guo", email = "noreply@example.com" },
     { name = "Xiao-Na Zhang" }
 ]
 

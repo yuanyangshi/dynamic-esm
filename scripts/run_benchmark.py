@@ -9,7 +9,6 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
-import os
 import numpy as np
 import pandas as pd
 
@@ -65,16 +64,19 @@ def main():
     y_pred = data["y_pred"]
     logger.info(f"Loaded {len(y_true)} authentic empirical predictions from {pred_path}")
 
-    # 1. CASF-2016 Benchmarks
-    df_bench, boot_results = evaluate_casf_benchmarks(y_true, y_pred)
-    df_bench.to_csv(os.path.join(table_dir, "Table_1_CASF2016_SOTA_Benchmarks.csv"), index=False)
+    # 1. Zero-Leakage Physical Benchmarks (Table 1) & CASF-2016 Literature Baselines (Supplementary Table 1)
+    df_bench_zero, boot_results = evaluate_casf_benchmarks(y_true, y_pred, benchmark_type="zero_leakage")
+    df_bench_zero.to_csv(os.path.join(table_dir, "Table_1_Zero_Leakage_Physical_Benchmark.csv"), index=False)
 
-    # 2. Ablation Benchmarks
+    df_bench_lit, _ = evaluate_casf_benchmarks(y_true, y_pred, benchmark_type="literature")
+    df_bench_lit.to_csv(os.path.join(table_dir, "Table_1_CASF2016_SOTA_Benchmarks.csv"), index=False)
+
+    # 2. Ablation Benchmarks (Table 2)
     df_ablation = run_ablation_benchmarks(y_true, y_pred)
     df_ablation.to_csv(os.path.join(table_dir, "Table_2_Ablation_Studies.csv"), index=False)
 
     # 3. Figures 2 & 3
-    plot_figure_2(df_bench, fig_dir, y_true=y_true, y_pred=y_pred)
+    plot_figure_2(df_bench_zero, fig_dir, y_true=y_true, y_pred=y_pred)
     plot_figure_3(df_ablation, fig_dir)
     logger.info("Benchmarking completed. Figures and tables exported.")
 

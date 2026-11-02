@@ -1,7 +1,7 @@
 <div align="center">
 
 # Dynamic-ESM
-### Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction
+### Bridging Evolutionary Protein Language Models with Quantum-Augmented Molecular Dynamics Enables Generalizable Binding Affinity Prediction and Mechanistic Discovery
 
 [![Python Version](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
@@ -183,9 +183,9 @@ If you use Dynamic-ESM in your research, please cite:
 
 ```bibtex
 @article{dynamic_esm2026,
-  title={Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction},
+  title={Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Augmented Molecular Dynamics Enables Generalizable Binding Affinity Prediction and Mechanistic Discovery},
   author={Guo, Shi-Xin and Zhang, Xiao-Na},
-  journal={arXiv preprint},
+  journal={Nature Communications (under review)},
   year={2026}
 }
 ```

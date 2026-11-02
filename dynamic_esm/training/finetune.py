@@ -84,6 +84,20 @@ def evaluate_model(
     return all_y, all_gamma, aleatoric, epistemic, total_uncert, float(rmse)
 
 
+def _optimizer_step(
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    scaler: GradScaler,
+    max_grad_norm: float = 1.0,
+) -> None:
+    """Unscale, clip, step and reset gradients for one effective batch."""
+    scaler.unscale_(optimizer)
+    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_grad_norm)
+    scaler.step(optimizer)
+    scaler.update()
+    optimizer.zero_grad(set_to_none=True)
+
+
 def run_finetuning(cfg: Config) -> str:
     """
     Main training execution for Dynamic-ESM.
@@ -157,7 +171,9 @@ def run_finetuning(cfg: Config) -> str:
     logger.info("Starting Fine-tuning Loop...")
     for epoch in range(1, cfg.NUM_EPOCHS + 1):
         model.train()
-        total_loss, total_steps = 0.0, 0
+        total_loss, total_steps = torch.zeros((), device=device), 0
+        pending_grads = False
+        optimizer.zero_grad(set_to_none=True)
         epoch_start = time.time()
 
         for step, batch in enumerate(train_loader):
@@ -186,19 +202,23 @@ def run_finetuning(cfg: Config) -> str:
                 loss = loss / cfg.GRAD_ACCUM_STEPS
 
             scaler.scale(loss).backward()
+            pending_grads = True
 
             if (step + 1) % cfg.GRAD_ACCUM_STEPS == 0:
-                scaler.unscale_(optimizer)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-                scaler.step(optimizer)
-                scaler.update()
-                optimizer.zero_grad()
+                _optimizer_step(model, optimizer, scaler)
+                pending_grads = False
 
-            total_loss += loss.item() * cfg.GRAD_ACCUM_STEPS
+            # Accumulate on device to avoid a host-device sync at every step
+            total_loss += loss.detach() * cfg.GRAD_ACCUM_STEPS
             total_steps += 1
 
+        # Flush a trailing partial accumulation window so that no gradient is
+        # dropped or leaked into the next epoch
+        if pending_grads:
+            _optimizer_step(model, optimizer, scaler)
+
         scheduler.step()
-        train_loss = total_loss / max(total_steps, 1)
+        train_loss = float(total_loss.item()) / max(total_steps, 1)
 
         # Validation
         y_val, gamma_val, aleatoric_val, epistemic_val, total_uncert_val, val_rmse = evaluate_model(

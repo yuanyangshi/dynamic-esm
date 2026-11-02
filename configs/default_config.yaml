@@ -3,11 +3,12 @@ data:
   data_dir: "./data"
   pretrain_dir: "./output/checkpoints"
   working_dir: "./output"
-  num_frames: 5
+  num_frames: 4       # Default T=4 for high-throughput inference; T=5 supported for dense trajectory visualization
   pocket_radius: 12.0
   max_seq_len: 1024
 
 model:
+  # Supports esm2_t33_650M_UR50D (d=1280 projected to 480 in manuscript) or lightweight esm2_t12_35M_UR50D (d=480)
   esm_model_name: "esm2_t12_35M_UR50D"
   esm_embed_dim: 480
   gnn_hidden_dim: 128

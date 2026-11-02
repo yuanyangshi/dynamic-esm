@@ -3,10 +3,10 @@ message: "If you use Dynamic-ESM in your research, please cite it as below."
 authors:
   - family-names: "Guo"
     given-names: "Shi-Xin"
-    email: "gsx112233hs@163.com"
+    email: "noreply@example.com"
   - family-names: "Zhang"
     given-names: "Xiao-Na"
-title: "Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Informed Molecular Dynamics for Generalizable Binding Affinity Prediction"
+title: "Dynamic-ESM: Bridging Evolutionary Protein Language Models with Quantum-Augmented Molecular Dynamics Enables Generalizable Binding Affinity Prediction and Mechanistic Discovery"
 version: 1.0.0
 date-released: 2026-10-01
 url: "https://github.com/yuanyangshi/dynamic-esm"

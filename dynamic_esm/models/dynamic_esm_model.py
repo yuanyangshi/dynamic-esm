@@ -9,11 +9,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 
-import esm
 from dynamic_esm.models.est_gnn import DynamicESMBackbone
 from dynamic_esm.models.cross_attention import DeepBiCrossAttention
 from dynamic_esm.models.evidential import EDLHead, dynamic_esm_criterion
 from dynamic_esm.models.lora import inject_lora_into_esm
+from dynamic_esm.utils.logging import get_logger
+
+logger = get_logger("dynamic_esm.model")
 
 
 class DynamicESM(nn.Module):
@@ -66,7 +68,12 @@ class DynamicESM(nn.Module):
                     esm_model, rank=lora_rank, alpha=lora_alpha, dropout=lora_dropout
                 )
                 self._esm_mock = False
-            except Exception:
+            except Exception as exc:
+                logger.warning(
+                    "Failed to load ESM-2 '%s' (%s); falling back to a randomly "
+                    "initialised embedding. Results are NOT valid for evaluation.",
+                    esm_model_name, exc,
+                )
                 self.esm = nn.Embedding(33, self.esm_embed_dim)
         else:
             self.esm = nn.Embedding(33, self.esm_embed_dim)

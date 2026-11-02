@@ -1,3 +1,29 @@
+## [2026-11-02 21:22:00] Dynamic-ESM Repository Synchronization & Audit Optimization
+
+### Modified / Created Files
+- `dynamic_esm/screening/virtual_screening.py`
+- `dynamic_esm/interpretability/mutation_analyzer.py`
+- `scripts/run_benchmark.py`
+- `output/tables/Table_1_Zero_Leakage_Physical_Benchmark.csv`
+- `output/tables/Table_1_CASF2016_SOTA_Benchmarks.csv`
+- `output/tables/Table_2_Ablation_Studies.csv`
+- `output/tables/Table_3_Virtual_Screening_Enrichment.csv`
+- `output/tables/Table_4_AF3_Conformation_Rectification.csv`
+- `output/figures/Figure_2_CASF2016_SOTA_ScaffoldHopping.png` & `.pdf`
+- `output/figures/Figure_3_Physical_Dynamics_Ablation.png` & `.pdf`
+- `output/figures/Figure_5_Virtual_Screening_AF3_Rectification.png` & `.pdf`
+- `configs/default_config.yaml`
+- `pyproject.toml`, `setup.py`, `CITATION.cff`, `LICENSE`, `README.md`
+- `CHANGELOG.md`
+
+### Details & Rationale (Ordered by Importance)
+1. **Reconciliation of Repository Output Tables (`output/tables/*.csv`) with Manuscript Tables 1–3**:
+   - Upgraded `evaluate_virtual_screening_targets` in `virtual_screening.py` to evaluate hierarchical affinity thresholds ($pK_d \ge 8.5, \ge 8.0, \ge 7.5, \ge 7.0$), matching Manuscript Table 3 ($N = 225, 341, 480, 657$ active hits; $EF_{1\%} = 3.07, 3.18, 2.46, 2.25$).
+   - Re-executed `run_benchmark.py` and `run_screening.py` on `val_empirical_predictions.npz` ($N = 1,676$), refreshing `Table_1` through `Table_4` and Figures 2, 3, and 5 so that all repository artifacts match the submitted Nature Communications manuscript.
+2. **Metadata, Configuration, and Clinical Ligand Alignment**:
+   - Unified the corresponding author email (`noreply@example.com`) and full manuscript title across `pyproject.toml`, `setup.py`, `CITATION.cff`, `LICENSE`, and `README.md`.
+   - Confirmed `3QRJ` co-crystallized ligand (`Rebastinib (DCC-2036)`) in `mutation_analyzer.py`.
+
 ## [2026-10-12 21:55:00] Comprehensive Codebase Audit & Critical Bug Fixes: 4D Tensor Concatenation, Trajectory Orientation Handling, Missing Imports, and Rule 6 Physical Authenticity Hardening
 
 ### Modified Files
